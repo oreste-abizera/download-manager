@@ -6,7 +6,7 @@
 <body>
 <%@ include file="../components/atoms/navbar.jsp" %>
 <div class="mt-2">
-  <h3 class="alert alert-light">Kalpix LTD Links List</h3>
+  <h3 class="alert alert-light">Kalpix LTD Websites List</h3>
 </div>
 <div class="">
   <div class="card mt-2">

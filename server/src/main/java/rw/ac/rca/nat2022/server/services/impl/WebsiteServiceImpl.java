@@ -99,7 +99,11 @@ public class WebsiteServiceImpl implements IWebsiteService {
         DownloadWebPage(homepageUrl, "C:\\download-manager\\" + domainName + "\\" + websiteName + ".html");
 
         // find website by domain name
-        Website website = null;
+        List<Website> allWebsites = websiteRepository.findAll();
+        Website website = allWebsites.stream()
+                .filter(w -> w.getWebsite_name().equals(domainName))
+                .findFirst()
+                .orElse(null);
         if(website == null) {
             WebsiteDTO websiteDTO = new WebsiteDTO();
             websiteDTO.setName(domainName);
@@ -108,7 +112,17 @@ public class WebsiteServiceImpl implements IWebsiteService {
         }
 
         // create or update link for homepage
-        Link savedLink = new Link();
+        List<Link> allLinks = linkRepository.findAll();
+        String finalWebsiteName = websiteName;
+        Website finalWebsite = website;
+        Link savedLink = allLinks.stream()
+                .filter(l -> l.getLink_name().equals(finalWebsiteName) && l.getWebsite().getId().equals(finalWebsite.getId()))
+                .findFirst()
+                .orElse(null);
+
+        if(savedLink == null) {
+            savedLink = new Link();
+        }
         savedLink.setLink_name(websiteName);
         savedLink.setWebsite(website);
 
