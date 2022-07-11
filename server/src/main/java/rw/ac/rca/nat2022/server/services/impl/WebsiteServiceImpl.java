@@ -5,13 +5,15 @@ import rw.ac.rca.nat2022.server.models.Link;
 import rw.ac.rca.nat2022.server.models.Website;
 import rw.ac.rca.nat2022.server.repositories.ILinkRepository;
 import rw.ac.rca.nat2022.server.repositories.IWebsiteRepository;
-import rw.ac.rca.nat2022.server.services.ILinkService;
 import rw.ac.rca.nat2022.server.services.IWebsiteService;
 import rw.ac.rca.nat2022.server.utils.dtos.WebsiteDTO;
 
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -60,7 +62,7 @@ public class WebsiteServiceImpl implements IWebsiteService {
     }
 
     @Override
-    public Website crawlWebsite(String url) {
+    public List<Website> crawlWebsite(String url) {
         System.out.println("Crawling website: " + url);
         // get domain name
         String postFixUrl = url.substring(url.indexOf("://") + 3);
@@ -96,7 +98,12 @@ public class WebsiteServiceImpl implements IWebsiteService {
         }
 
         String homepageUrl = url;
+
+        Long start = System.nanoTime();
         DownloadWebPage(homepageUrl, "C:\\download-manager\\" + domainName + "\\" + websiteName + ".html");
+        Long finish = System.nanoTime();
+
+        Long timeElapsed = finish - start;
 
         // find website by domain name
         List<Website> allWebsites = websiteRepository.findAll();
@@ -107,8 +114,27 @@ public class WebsiteServiceImpl implements IWebsiteService {
         if(website == null) {
             WebsiteDTO websiteDTO = new WebsiteDTO();
             websiteDTO.setName(domainName);
+            websiteDTO.setDownloadStartDateTime(start);
+            websiteDTO.setDownloadEndDateTime(finish);
+            websiteDTO.setTotalElapsedTime(timeElapsed);
             website = new Website(websiteDTO);
             website = websiteRepository.save(website);
+        }else {
+            website.setDownload_start_date_time(start);
+            website.setDownload_end_date_time(finish);
+            if(website.getTotal_elapsed_time() == null) {
+                website.setTotal_elapsed_time(timeElapsed);
+            }else {
+                website.setTotal_elapsed_time(website.getTotal_elapsed_time() + timeElapsed);
+            }
+            Long totalDownloadedKilobytes = getFileSize("C:\\download-manager\\" + domainName + "\\" + websiteName + ".html");
+            if (website.getTotal_downloaded_kilobytes() == null) {
+                website.setTotal_downloaded_kilobytes(totalDownloadedKilobytes);
+            }else {
+                website.setTotal_downloaded_kilobytes(website.getTotal_downloaded_kilobytes() + totalDownloadedKilobytes);
+            }
+            System.out.println("Total downloaded kilobytes: " + website.getTotal_downloaded_kilobytes());
+            websiteRepository.save(website);
         }
 
         // create or update link for homepage
@@ -123,11 +149,13 @@ public class WebsiteServiceImpl implements IWebsiteService {
         if(savedLink == null) {
             savedLink = new Link();
         }
+        savedLink.setTotal_elapsed_time(timeElapsed);
         savedLink.setLink_name(websiteName);
         savedLink.setWebsite(website);
+        savedLink.setTotal_downloaded_kilobytes(getFileSize("C:\\download-manager\\" + domainName + "\\" + websiteName + ".html"));
 
         savedLink = linkRepository.save(savedLink);
-        return null;
+        return websiteRepository.findAll();
     }
 
     public static void DownloadWebPage(String webpage, String outputFile) {
@@ -146,5 +174,20 @@ public class WebsiteServiceImpl implements IWebsiteService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Long getFileSize(String fileName){
+        Path path = Paths.get(fileName);
+
+        try {
+
+            // size of a file (in bytes)
+            Long bytes = Files.size(path);
+            return bytes / 1024;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0L;
     }
 }

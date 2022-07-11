@@ -21,8 +21,8 @@ public class Link {
     @Column(name = "id", nullable = false)
     private Long id;
     private String link_name;
-    private String total_elapsed_time;
-    private String total_downloaded_kilobytes;
+    private Long total_elapsed_time;
+    private Long total_downloaded_kilobytes;
     @ManyToOne
     @JoinColumn(name = "website_id", nullable = false)
     private Website website;

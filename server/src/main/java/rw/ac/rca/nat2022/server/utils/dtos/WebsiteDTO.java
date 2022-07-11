@@ -12,8 +12,8 @@ import lombok.Setter;
 public class WebsiteDTO {
     private Long id;
     private String name;
-    private String downloadStartDateTime;
-    private String downloadEndDateTime;
-    private String totalElapsedTime;
+    private Long downloadStartDateTime;
+    private Long downloadEndDateTime;
+    private Long totalElapsedTime;
     private Long totalDownloadedKilobytes;
 }

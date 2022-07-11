@@ -12,5 +12,5 @@ public interface IWebsiteService {
     Website getWebsiteById(Long id);
     void deleteWebsiteById(Long id);
 
-    Website crawlWebsite(String url);
+    List<Website> crawlWebsite(String url);
 }

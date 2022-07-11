@@ -24,9 +24,9 @@ public class Website {
     @Column(name = "id", nullable = false)
     private Long id;
     private String website_name;
-    private String download_start_date_time;
-    private String download_end_date_time;
-    private String total_elapsed_time;
+    private Long download_start_date_time;
+    private Long download_end_date_time;
+    private Long total_elapsed_time;
     private Long total_downloaded_kilobytes;
     @OneToMany(mappedBy = "website")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")

@@ -39,4 +39,14 @@ public class LinksResource {
         model.addAttribute("links", links);
         return "links/list";
     }
+
+    @GetMapping("list-search")
+    public String listSearch(HttpServletRequest request, Model model) {
+        if(request.getSession().getAttribute("token") == null || request.getSession().getAttribute("token").toString().isEmpty()){
+            return "redirect:/auth/login";
+        }
+        System.out.println("hereeeee");
+        return "links/list-search";
+    }
+
 }

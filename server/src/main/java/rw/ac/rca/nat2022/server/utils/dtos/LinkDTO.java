@@ -12,7 +12,7 @@ import lombok.Setter;
 public class LinkDTO {
     private Long id;
     private String linkName;
-    private String totalElapsedTime;
-    private String totalDownloadedKilobytes;
+    private Long totalElapsedTime;
+    private Long totalDownloadedKilobytes;
     private Long websiteId;
 }
