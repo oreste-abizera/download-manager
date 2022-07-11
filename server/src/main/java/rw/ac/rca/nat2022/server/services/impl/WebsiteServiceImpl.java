@@ -1,20 +1,27 @@
 package rw.ac.rca.nat2022.server.services.impl;
 
 import org.springframework.stereotype.Service;
+import rw.ac.rca.nat2022.server.models.Link;
 import rw.ac.rca.nat2022.server.models.Website;
+import rw.ac.rca.nat2022.server.repositories.ILinkRepository;
 import rw.ac.rca.nat2022.server.repositories.IWebsiteRepository;
+import rw.ac.rca.nat2022.server.services.ILinkService;
 import rw.ac.rca.nat2022.server.services.IWebsiteService;
 import rw.ac.rca.nat2022.server.utils.dtos.WebsiteDTO;
 
-import java.io.File;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 @Service
 public class WebsiteServiceImpl implements IWebsiteService {
     private final IWebsiteRepository websiteRepository;
+    private final ILinkRepository linkRepository;
 
-    public WebsiteServiceImpl(IWebsiteRepository websiteRepository) {
+    public WebsiteServiceImpl(IWebsiteRepository websiteRepository, ILinkRepository linkRepository) {
         this.websiteRepository = websiteRepository;
+        this.linkRepository = linkRepository;
     }
 
     @Override
@@ -58,8 +65,21 @@ public class WebsiteServiceImpl implements IWebsiteService {
         // get domain name
         String postFixUrl = url.substring(url.indexOf("://") + 3);
         String domainName = postFixUrl.substring(0, postFixUrl.indexOf("/"));
-        // get website name
-        String websiteName = domainName.substring(domainName.indexOf(".") + 1);
+        // get website name as string after domain name slash
+        String websiteName = postFixUrl.substring(postFixUrl.indexOf("/") + 1);
+        websiteName = websiteName.replace("/", " ");
+        if(websiteName.contains("?")) {
+            websiteName = websiteName.substring(0, websiteName.indexOf("?"));
+        }
+        if(websiteName.contains("#")) {
+            websiteName = websiteName.substring(0, websiteName.indexOf("#"));
+        }
+        if(websiteName.contains(".")) {
+            websiteName = websiteName.substring(0, websiteName.indexOf("."));
+        }
+         if(websiteName.isEmpty()){
+             websiteName = "index";
+         }
 
         System.out.println("Domain name: " + domainName);
         System.out.println("Website name: " + websiteName);
@@ -76,7 +96,41 @@ public class WebsiteServiceImpl implements IWebsiteService {
         }
 
         String homepageUrl = url;
-//        String homepageFilename = "C:\\download-manager\\" + domainName + "\\" + websiteName + ".html";
+        DownloadWebPage(homepageUrl, "C:\\download-manager\\" + domainName + "\\" + websiteName + ".html");
+
+        // find website by domain name
+        Website website = null;
+        if(website == null) {
+            WebsiteDTO websiteDTO = new WebsiteDTO();
+            websiteDTO.setName(domainName);
+            website = new Website(websiteDTO);
+            website = websiteRepository.save(website);
+        }
+
+        // create or update link for homepage
+        Link savedLink = new Link();
+        savedLink.setLink_name(websiteName);
+        savedLink.setWebsite(website);
+
+        savedLink = linkRepository.save(savedLink);
         return null;
+    }
+
+    public static void DownloadWebPage(String webpage, String outputFile) {
+        try {
+            URL url = new URL(webpage);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            String line;
+            FileWriter writer = new FileWriter(outputFile);
+            while ((line = reader.readLine()) != null) {
+                writer.write(line + "\n");
+            }
+            writer.close();
+            reader.close();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

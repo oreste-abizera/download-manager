@@ -28,7 +28,7 @@
           <td>${link.link_name}</td>
           <td>${link.total_elapsed_time}</td>
             <td>${link.total_downloaded_kilobytes}</td>
-            <td>${link.website ? link.website.website_name : "N/A"}</td>
+            <td>${link.website != null ? link.website.website_name : "N/A"}</td>
         </tr>
       </c:forEach>
       </tbody>

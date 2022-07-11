@@ -1,5 +1,8 @@
 package rw.ac.rca.nat2022.server.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +29,8 @@ public class Website {
     private String total_elapsed_time;
     private Long total_downloaded_kilobytes;
     @OneToMany(mappedBy = "website")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private Set<Link> links;
 
     public Website(WebsiteDTO websiteDTO){
