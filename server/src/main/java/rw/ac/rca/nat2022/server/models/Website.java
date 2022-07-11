@@ -7,6 +7,7 @@ import lombok.Setter;
 import rw.ac.rca.nat2022.server.utils.dtos.WebsiteDTO;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "website")
@@ -24,8 +25,8 @@ public class Website {
     private String download_end_date_time;
     private String total_elapsed_time;
     private Long total_downloaded_kilobytes;
-    @OneToOne(mappedBy = "website")
-    private Link link;
+    @OneToMany(mappedBy = "website")
+    private Set<Link> links;
 
     public Website(WebsiteDTO websiteDTO){
         this.website_name = websiteDTO.getName();

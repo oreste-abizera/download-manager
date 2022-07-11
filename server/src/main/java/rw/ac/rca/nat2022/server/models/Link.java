@@ -23,8 +23,8 @@ public class Link {
     private String link_name;
     private String total_elapsed_time;
     private String total_downloaded_kilobytes;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "website_id", referencedColumnName = "id")
+    @ManyToOne
+    @JoinColumn(name = "website_id", nullable = false)
     private Website website;
 
     public Link(LinkDTO linkDTO){
