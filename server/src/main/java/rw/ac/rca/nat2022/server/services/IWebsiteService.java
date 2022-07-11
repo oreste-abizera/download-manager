@@ -11,4 +11,6 @@ public interface IWebsiteService {
     Website update(Long id, WebsiteDTO websiteDTO);
     Website getWebsiteById(Long id);
     void deleteWebsiteById(Long id);
+
+    Website crawlWebsite(String url);
 }

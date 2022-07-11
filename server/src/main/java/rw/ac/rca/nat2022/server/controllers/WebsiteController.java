@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import rw.ac.rca.nat2022.server.services.IWebsiteService;
 import rw.ac.rca.nat2022.server.utils.ApiResponse;
+import rw.ac.rca.nat2022.server.utils.dtos.CrawlDTO;
 import rw.ac.rca.nat2022.server.utils.dtos.WebsiteDTO;
 
 @RestController
@@ -18,6 +19,11 @@ public class WebsiteController {
     @GetMapping("")
     public ApiResponse getAllWebsites() {
         return new ApiResponse(HttpStatus.OK, true, "All websites fetched", websiteService.getAllWebsites());
+    }
+
+    @PostMapping("/crawl")
+    public ApiResponse crawlWebsite(@RequestBody CrawlDTO crawlDTO) {
+        return new ApiResponse(HttpStatus.OK, true, "Website crawled", websiteService.crawlWebsite(crawlDTO.getUrl()));
     }
 
     @GetMapping("/{id}")

@@ -6,6 +6,7 @@ import rw.ac.rca.nat2022.server.repositories.IWebsiteRepository;
 import rw.ac.rca.nat2022.server.services.IWebsiteService;
 import rw.ac.rca.nat2022.server.utils.dtos.WebsiteDTO;
 
+import java.io.File;
 import java.util.List;
 
 @Service
@@ -49,5 +50,30 @@ public class WebsiteServiceImpl implements IWebsiteService {
     @Override
     public void deleteWebsiteById(Long id) {
         websiteRepository.deleteById(id);
+    }
+
+    @Override
+    public Website crawlWebsite(String url) {
+        System.out.println("Crawling website: " + url);
+        // get domain name
+        String postFixUrl = url.substring(url.indexOf("://") + 3);
+        String domainName = postFixUrl.substring(0, postFixUrl.indexOf("/"));
+        // get website name
+        String websiteName = domainName.substring(domainName.indexOf(".") + 1);
+
+        System.out.println("Domain name: " + domainName);
+        System.out.println("Website name: " + websiteName);
+
+        File file = new File("C:\\download-manager\\" + domainName);
+        if (!file.exists()) {
+            if (file.mkdir()) {
+                System.out.println("Directory is created!");
+            } else {
+                System.out.println("Failed to create directory!");
+            }
+        }else {
+            System.out.println("Directory already exists!");
+        }
+        return null;
     }
 }
