@@ -14,6 +14,8 @@ import rw.ac.rca.nat2022.client.dao.Website;
 import rw.ac.rca.nat2022.client.utils.ApiResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +64,16 @@ public class WebsitesResource {
             model.addAttribute("url", url);
             return "websites/crawl";
         }
+        if (!check_URL(url)) {
+            model.addAttribute("error", "URL is not valid");
+            model.addAttribute("url", url);
+            return "websites/crawl";
+        }
+        if(!exists(url)){
+            model.addAttribute("error", "URL does not exist");
+            model.addAttribute("url", url);
+            return "websites/crawl";
+        }
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 
@@ -72,11 +84,35 @@ public class WebsitesResource {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("url", url);
 
+        System.out.println("hereee");
+
         HttpEntity<Object> entity = new HttpEntity<>(requestBody, headers);
 
         ApiResponse response = restTemplate.exchange(formatURL("/api/websites/crawl?url=" + url), HttpMethod.POST, entity, ApiResponse.class).getBody();
         List<Website> websites = (List<Website>) response.getData();
         model.addAttribute("websites", websites);
         return "websites/list";
+    }
+
+    public boolean check_URL(String urlString) {
+        try {
+            new URL(urlString).toURI();
+            return true;
+        } catch (Exception e1) {
+            return false;
+        }
+    }
+    public boolean exists(String URLName){
+        try {
+            HttpURLConnection.setFollowRedirects(false);
+            HttpURLConnection con =
+                    (HttpURLConnection) new URL(URLName).openConnection();
+            con.setRequestMethod("HEAD");
+            return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

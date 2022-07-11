@@ -74,6 +74,9 @@ public class WebsiteServiceImpl implements IWebsiteService {
         }else {
             System.out.println("Directory already exists!");
         }
+
+        String homepageUrl = url;
+//        String homepageFilename = "C:\\download-manager\\" + domainName + "\\" + websiteName + ".html";
         return null;
     }
 }
